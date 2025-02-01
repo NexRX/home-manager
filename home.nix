@@ -87,6 +87,7 @@
     LD_LIBRARY_PATH = "${pkgs.glfw}/lib";
   };
 
+  services.kdeconnect.enable = true;
   programs.bash = {
     enable = true;
     sessionVariables = {

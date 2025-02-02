@@ -1,6 +1,9 @@
-{ config, pkgs, ... }:
+{ config, pkgs, inputs, ... }:
 
-{
+let 
+ system = pkgs.hostPlatform.system;
+ nix-gaming = inputs.nix-gaming.packages.${system};
+in {
   # Home Manager needs a bit of information about you and the paths it should
   # manage.
   home.username = "nex";
@@ -14,6 +17,10 @@
     prismlauncher
     discord
     lutris
+    # Nix Gaming - https://github.com/fufexan/nix-gaming
+    # nix-gaming.wine-ge or wine-tkg
+    nix-gaming.wine-discord-ipc-bridge
+    nix-gaming.star-citizen
 
     # Security
     keepassxc
@@ -45,6 +52,12 @@
 
     (writeShellScriptBin "echo-pkgs" ''
       echo "${pkgs.glfw}/lib"
+    '')
+    (writeShellScriptBin "wine-control-star-citizen" ''
+      WINEPREFIX=$HOME/Games/star-citizen nix run github:fufexan/nix-gaming#wine-ge -- control
+    '')
+    (writeShellScriptBin "wine-cfg-star-citizen" ''
+      WINEPREFIX=$HOME/Games/star-citizen nix run github:fufexan/nix-gaming#wine-ge -- winecfg
     '')
     (writeShellScriptBin "switch" ''
       echo "✨ Switching User!"

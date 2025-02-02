@@ -20,7 +20,7 @@ in {
     # Nix Gaming - https://github.com/fufexan/nix-gaming
     # nix-gaming.wine-ge or wine-tkg
     nix-gaming.wine-discord-ipc-bridge
-    nix-gaming.star-citizen
+    # nix-gaming.star-citizen
 
     # Security
     keepassxc
@@ -37,12 +37,16 @@ in {
 
     # Tools
     kdePackages.konqueror
+    kdePackages.filelight
     filezilla
+    thunderbird
     qbittorrent
     ghostty # terminal
     nushell # shell
     carapace
     starship
+    neofetch
+    lsof
 
     # Coding
     vscode
@@ -59,10 +63,12 @@ in {
     (writeShellScriptBin "wine-cfg-star-citizen" ''
       WINEPREFIX=$HOME/Games/star-citizen nix run github:fufexan/nix-gaming#wine-ge -- winecfg
     '')
+    (writeShellScriptBin "hs" "switch")
     (writeShellScriptBin "switch" ''
       echo "✨ Switching User!"
       home-manager switch
     '')
+    (writeShellScriptBin "ns" "nixswitch")
     (writeShellScriptBin "nixswitch" ''
       echo "✨ Switching NixOS System!"
       sudo nixos-rebuild switch --flake /etc/nixos
@@ -98,6 +104,7 @@ in {
     EDITOR = "code --wait";
     QT_QPA_PLATFORM_PLUGIN_PATH = "${qt5.qtbase.bin}/lib/qt-${qt5.qtbase.version}/plugins";
     LD_LIBRARY_PATH = "${pkgs.glfw}/lib";
+    # WINE_FULLSCREEN_FSR = "1";
   };
 
   services.kdeconnect.enable = true;

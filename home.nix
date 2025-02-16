@@ -1,9 +1,15 @@
-{ config, pkgs, inputs, ... }:
+{
+  config,
+  pkgs,
+  inputs,
+  ...
+}:
 
-let 
- system = pkgs.hostPlatform.system;
- nix-gaming = inputs.nix-gaming.packages.${system};
-in {
+let
+  system = pkgs.hostPlatform.system;
+  nix-gaming = inputs.nix-gaming.packages.${system};
+in
+{
   # Home Manager needs a bit of information about you and the paths it should
   # manage.
   home.username = "nex";
@@ -48,6 +54,11 @@ in {
     neofetch
     lsof
 
+    # Key binidngs stuff
+    xorg.xev
+    xbindkeys
+    xdotool
+
     # Coding
     vscode
     git
@@ -63,6 +74,24 @@ in {
     (writeShellScriptBin "wine-cfg-star-citizen" ''
       WINEPREFIX=$HOME/Games/star-citizen nix run github:fufexan/nix-gaming#wine-ge -- winecfg
     '')
+    (writeShellScriptBin "bt-reset" ''
+      #!/bin/bash
+      bluetoothctl power off
+      sudo systemctl stop bluetooth
+      sudo rfkill block bluetooth
+      sudo rfkill unblock bluetooth
+      sudo systemctl start bluetooth
+      sleep 1
+      bluetoothctl power on
+      exit 0
+    '')
+    (writeShellScriptBin "bt-fix" ''
+      #!/bin/bash
+      # take first arg as mac address and use it or default to 78:2B:64:14:B8:27
+      HEADPHONES_MAC="${"$"}{1:-78:2B:64:14:B8:27}"
+      bluetoothctl remove $HEADPHONES_MAC
+      bluetoothctl connect $HEADPHONES_MAC
+    '')
     (writeShellScriptBin "hs" "switch")
     (writeShellScriptBin "switch" ''
       echo "✨ Switching User!"
@@ -74,6 +103,30 @@ in {
       sudo nixos-rebuild switch --flake /etc/nixos
     '')
   ];
+
+  # Custom Key binds - Run `systemctl --user restart xbindkeys` after changing
+  xdg.configFile."xbindkeys/config".text = ''
+    # On F3 Mouse Button, Type following:
+    # "xdotool type 'Hello World'"
+    "bash -c 'xdotool type $(cat ~/.config/home-manager/secrets/p.txt)'"
+      F3
+  '';
+  systemd.user.services.xbindkeys = {
+    Unit = {
+      Description = "xbindkeys daemon";
+      PartOf = [ "graphical-session.target" ];
+      After = [ "graphical-session.target" ];
+    };
+
+    Service = {
+      ExecStart = "${pkgs.xbindkeys}/bin/xbindkeys -n -f %h/.config/xbindkeys/config";
+      Restart = "always";
+    };
+
+    Install = {
+      WantedBy = [ "graphical-session.target" ];
+    };
+  };
 
   # Home Manager is pretty good at managing dotfiles. The primary way to manage
   # plain files is through 'home.file'.

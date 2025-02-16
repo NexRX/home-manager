@@ -57,6 +57,7 @@ in
     xorg.xev
     xbindkeys
     xdotool
+    piper
 
     # Coding
     vscode

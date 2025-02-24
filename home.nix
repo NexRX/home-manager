@@ -1,12 +1,14 @@
 {
   pkgs,
   inputs,
+  lib,
   ...
 }:
 
 let
   system = pkgs.hostPlatform.system;
   nix-gaming = inputs.nix-gaming.packages.${system};
+  toggleKeybinds = false;
 in
 {
   # Home Manager needs a bit of information about you and the paths it should
@@ -105,12 +107,14 @@ in
   ];
 
   # Custom Key binds - Run `systemctl --user restart xbindkeys` after changing
-  xdg.configFile."xbindkeys/config".text = ''
-    # On F3 Mouse Button, Type following:
-    # "xdotool type 'Hello World'"
-    "bash -c 'xdotool type $(cat ~/.config/home-manager/secrets/p.txt)'"
-      F3
-  '';
+  xdg = lib.mkIf (toggleKeybinds && true) {
+    configFile."xbindkeys/config".text = ''
+      # On F3 Mouse Button, Type following:
+      # "xdotool type 'Hello World'"
+      "bash -c 'xdotool type $(cat ~/.config/home-manager/secrets/p.txt)'"
+        F3
+    '';
+  };
   systemd.user.services.xbindkeys = {
     Unit = {
       Description = "xbindkeys daemon";

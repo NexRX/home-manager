@@ -8,7 +8,7 @@
 let
   system = pkgs.hostPlatform.system;
   nix-gaming = inputs.nix-gaming.packages.${system};
-  toggleKeybinds = false;
+  toggleKeybinds = true;
 in
 {
   # Home Manager needs a bit of information about you and the paths it should
@@ -23,6 +23,7 @@ in
     # Gaming
     prismlauncher
     discord
+    vesktop # Improved Discord
     lutris
     # Nix Gaming - https://github.com/fufexan/nix-gaming
     # nix-gaming.wine-ge or wine-tkg
@@ -115,6 +116,7 @@ in
         F3
     '';
   };
+
   systemd.user.services.xbindkeys = {
     Unit = {
       Description = "xbindkeys daemon";
